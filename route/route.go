@@ -4,6 +4,7 @@ import (
 	"gin_base/app/controller/common"
 	"gin_base/app/helper/response_helper"
 	"gin_base/app/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,6 +15,9 @@ func InitRouter(e *gin.Engine) {
 
 	// 邮件记录首页
 	e.GET("/", common.EmailLogIndex)
+
+	// favicon
+	e.StaticFile("/favicon.png", "./static/image/favicon.png")
 
 	api := e.Group("/api")
 	api.GET("/test", common.Test)
