@@ -5,14 +5,14 @@ services:
     ports:
       - 7878:3000
     environment:
-      - TZ=Asia/Shanghai  #时区
-      - PORT=3000          #服务端口
+      - TZ=${TZ:-Asia/Shanghai}                         #时区
+      - PORT=${PORT:-3000}                              #服务端口
       #SMTP邮件配置
-      - SMTP_HOST=smtp.example.com
-      - SMTP_PORT=587
-      - SMTP_USERNAME=your_email@example.com
-      - SMTP_PASSWORD=your_password
-      - SMTP_FROM=your_email@example.com
-      - SMTP_FROM_NAME=EmailTool
+      - SMTP_HOST=${SMTP_HOST:-smtp.example.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME:-your_email@example.com}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-your_password}
+      - SMTP_FROM=${SMTP_FROM:-your_email@example.com}
+      - SMTP_FROM_NAME=${SMTP_FROM_NAME:-EmailTool}
       # 邮件接口授权码
-      - EMAIL_AUTH_CODE=your_auth_code
+      - EMAIL_AUTH_CODE=${EMAIL_AUTH_CODE:-your_auth_code}
