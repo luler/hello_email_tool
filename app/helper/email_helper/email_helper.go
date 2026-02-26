@@ -3,6 +3,7 @@ package email_helper
 import (
 	"crypto/tls"
 	"fmt"
+	"mime" // 新增：用于对邮件头部中的中文字符进行 Base64 编码
 	"net/smtp"
 	"os"
 	"strconv"
@@ -59,31 +60,42 @@ func SendEmail(config EmailConfig, message EmailMessage) EmailResult {
 		return EmailResult{Success: false, Error: "收件人不能为空"}
 	}
 
-	// 构建邮件头
-	headers := make(map[string]string)
+	// 构建邮件内容：废弃 map，按严格的 SMTP 标准顺序拼接
+	var msgBuilder strings.Builder
+
+	// 1. 发件人 (处理中文昵称乱码和规范问题)
 	if config.FromName != "" {
-		headers["From"] = fmt.Sprintf("%s <%s>", config.FromName, config.From)
+		// 使用 mime.BEncoding 进行 RFC 2047 编码
+		encodedFromName := mime.BEncoding.Encode("UTF-8", config.FromName)
+		msgBuilder.WriteString(fmt.Sprintf("From: %s <%s>\r\n", encodedFromName, config.From))
 	} else {
-		headers["From"] = config.From
-	}
-	headers["To"] = strings.Join(message.To, ",")
-	if len(message.Cc) > 0 {
-		headers["Cc"] = strings.Join(message.Cc, ",")
-	}
-	headers["Subject"] = message.Subject
-	headers["MIME-Version"] = "1.0"
-	if message.IsHTML {
-		headers["Content-Type"] = "text/html; charset=UTF-8"
-	} else {
-		headers["Content-Type"] = "text/plain; charset=UTF-8"
+		msgBuilder.WriteString(fmt.Sprintf("From: %s\r\n", config.From))
 	}
 
-	// 构建邮件内容
-	var msgBuilder strings.Builder
-	for k, v := range headers {
-		msgBuilder.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
+	// 2. 收件人
+	msgBuilder.WriteString(fmt.Sprintf("To: %s\r\n", strings.Join(message.To, ",")))
+
+	// 3. 抄送人
+	if len(message.Cc) > 0 {
+		msgBuilder.WriteString(fmt.Sprintf("Cc: %s\r\n", strings.Join(message.Cc, ",")))
 	}
+
+	// 4. 邮件主题 (处理中文主题乱码，这是防止解析崩溃的关键)
+	encodedSubject := mime.BEncoding.Encode("UTF-8", message.Subject)
+	msgBuilder.WriteString(fmt.Sprintf("Subject: %s\r\n", encodedSubject))
+
+	// 5. MIME 协议版本及格式
+	msgBuilder.WriteString("MIME-Version: 1.0\r\n")
+	if message.IsHTML {
+		msgBuilder.WriteString("Content-Type: text/html; charset=UTF-8\r\n")
+	} else {
+		msgBuilder.WriteString("Content-Type: text/plain; charset=UTF-8\r\n")
+	}
+
+	// 6. 邮件头和正文的严格分隔符 (连续的 \r\n\r\n，因为上一行结尾有一个，这里再加一个)
 	msgBuilder.WriteString("\r\n")
+	
+	// 7. 邮件正文
 	msgBuilder.WriteString(message.Body)
 
 	// 合并所有收件人
