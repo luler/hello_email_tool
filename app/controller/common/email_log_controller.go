@@ -30,8 +30,8 @@ func GetEmailLogList(c *gin.Context) {
 	var param Param
 	request_helper.InputStruct(c, &param)
 
-	// 验证授权码
-	if param.AuthCode != os.Getenv("EMAIL_AUTH_CODE") {
+	// 验证授权码（页面专用）
+	if param.AuthCode != os.Getenv("WEB_AUTH_CODE") {
 		exception_helper.CommonException("授权码错误")
 	}
 
@@ -94,8 +94,8 @@ func DeleteEmailLog(c *gin.Context) {
 	var param Param
 	request_helper.InputStruct(c, &param)
 
-	// 验证授权码
-	if param.AuthCode != os.Getenv("EMAIL_AUTH_CODE") {
+	// 验证授权码（页面专用）
+	if param.AuthCode != os.Getenv("WEB_AUTH_CODE") {
 		exception_helper.CommonException("授权码错误")
 	}
 

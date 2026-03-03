@@ -27,8 +27,11 @@ SMTP_PASSWORD=your_password
 SMTP_FROM=your_email@example.com
 SMTP_FROM_NAME=EmailTool
 
-# 邮件接口授权码
+# 邮件接口授权码（支持多个，逗号隔开）
 EMAIL_AUTH_CODE=your_auth_code
+
+# 页面访问授权码（单个）
+WEB_AUTH_CODE=your_web_auth_code
 ```
 
 ## 运行
@@ -53,7 +56,7 @@ gin serve run main.go
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| auth_code | string | 是 | 授权码，需与环境变量 EMAIL_AUTH_CODE 一致 |
+| auth_code | string | 是 | 授权码，需与环境变量 EMAIL_AUTH_CODE 之一匹配（支持多个，逗号隔开） |
 | to | string | 是 | 收件人，多个用逗号分隔 |
 | cc | string | 否 | 抄送人，多个用逗号分隔 |
 | subject | string | 是 | 邮件主题 |

@@ -19,5 +19,7 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD:-your_password}
       - SMTP_FROM=${SMTP_FROM:-your_email@example.com}
       - SMTP_FROM_NAME=${SMTP_FROM_NAME:-EmailTool}
-      # 邮件接口授权码
+      # 邮件接口授权码（支持多个，逗号隔开）
       - EMAIL_AUTH_CODE=${EMAIL_AUTH_CODE:-your_auth_code}
+      # 页面访问授权码（单个）
+      - WEB_AUTH_CODE=${WEB_AUTH_CODE:-your_web_auth_code}

@@ -27,8 +27,16 @@ func Email(c *gin.Context) {
 	var param Param
 	request_helper.InputStruct(c, &param)
 
-	// 验证授权码
-	if param.AuthCode != os.Getenv("EMAIL_AUTH_CODE") {
+	// 验证授权码（支持多个，逗号隔开）
+	authCodes := strings.Split(os.Getenv("EMAIL_AUTH_CODE"), ",")
+	validCode := false
+	for _, code := range authCodes {
+		if strings.TrimSpace(code) == param.AuthCode {
+			validCode = true
+			break
+		}
+	}
+	if !validCode {
 		exception_helper.CommonException("授权码错误")
 	}
 
